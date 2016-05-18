@@ -1,7 +1,5 @@
 #lang racket/gui
 
-(require "collide.rkt" "languages.rkt" racket/block)
-
 ; Stuff
 (define (r1 c) (add1 (random (floor c))))
 (define (r0 c) (let ([xc (abs (inexact->exact (ceiling c)))]) (add1 (- (sub1 (/ xc 2)) (random xc)))))
