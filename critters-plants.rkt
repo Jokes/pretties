@@ -21,7 +21,7 @@
 (define (rcol+ c)
   (make-object color% (rc+ (send c red)) (rc+ (send c green)) (rc+ (send c blue))))
 (define col-
-  (let ([subsum 4])
+  (let ([subsum 1])
     (λ (c)
       (make-object color% 
         (colsafe (- (send c red) subsum)) 
@@ -47,9 +47,7 @@
   (hash-set! plantlife (list x y) (Plant clr clr x y)))
 
 (define adjacencies
-  (let ([adj-list '((-1 -1) (0 -1) (1 -1) 
-                            (-1 0) (1 0)
-                            (-1 1) (0 1) (1 1))])
+  (let ([adj-list '(#;(-1 -1) (0 -1) #;(1 -1) (-1 0) (1 0) #;(-1 1) (0 1) #;(1 1))])
     (λ (x y w h)
       (filter
        (λ (pt) (and (> (first pt) 0) (< (first pt) w)
@@ -81,7 +79,6 @@
   (let-values ([(w h) (send dc get-size)]) (send dc draw-rectangle 0 0 w h))
   (for-each (λ (p)
               (send dc set-pen (Plant-curcol p) field-scale 'solid)
-              (send dc set-brush (Plant-curcol p) 'solid)
               (send dc draw-line (* field-scale (Plant-x p)) (* field-scale (Plant-y p)) 
                     (* field-scale (Plant-x p)) (* field-scale (Plant-y p))))
             (hash-values plantlife)))
@@ -96,8 +93,11 @@
 (define critter-canvas%
   (class canvas%
     (define/override (on-event event)
-      (when (and (is-a? event mouse-event%) (equal? (send event get-event-type) 'left-up))
-        (new-plant! (floor (/ (send event get-x) field-scale)) (floor (/ (send event get-y) field-scale)))))
+      (when (and (is-a? event mouse-event%))
+        (when (equal? (send event get-event-type) 'left-up)
+          (new-plant! (floor (/ (send event get-x) field-scale)) (floor (/ (send event get-y) field-scale))))
+        (when (equal? (send event get-event-type) 'right-up)
+          (send tim stop))))
     (super-new)))
 (define cv (new critter-canvas% [parent panel1] 
                 [paint-callback (λ (canvas dc) (paint-plants! dc))]))
